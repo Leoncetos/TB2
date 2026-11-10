@@ -1,0 +1,5 @@
+1|1|2|0|2026-09-20 09:00|Inicio de coordinacion TB1
+2|2|2|1|2026-09-20 09:10|Revisando el diagrama UML
+3|3|2|2|2026-09-20 09:15|Listo, subo las clases hoy
+4|1|1|0|2026-09-20 08:00|Bienvenidos al ciclo 2026-2
+5|2|1|4|2026-09-20 08:30|Gracias, atentos a avisos
