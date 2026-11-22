@@ -133,13 +133,17 @@
     <ClInclude Include="ContenidoMensaje.h" />
     <ClInclude Include="Emoji.h" />
     <ClInclude Include="Estado.h" />
+    <ClInclude Include="FuncionesHash.h" />
     <ClInclude Include="Hilo.h" />
     <ClInclude Include="Mensaje.h" />
     <ClInclude Include="MensajeArchivo.h" />
     <ClInclude Include="MensajeTexto.h" />
     <ClInclude Include="notificacion.h" />
+    <ClInclude Include="QuickSort.h" />
     <ClInclude Include="RegistroActividad.h" />
     <ClInclude Include="Rol.h" />
+    <ClInclude Include="SlackSistema.h" />
+    <ClInclude Include="TablaHash.h" />
     <ClInclude Include="Usuario.h" />
     <ClInclude Include="Utilidades.h" />
   </ItemGroup>
