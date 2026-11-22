@@ -1,5 +1,8 @@
 #pragma once
+#include <string>
 #include "ContenidoMensaje.h"
+
+using namespace std;
 
 class MensajeTexto : public ContenidoMensaje {
 private:
