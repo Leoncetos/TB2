@@ -3,7 +3,6 @@
 
 using namespace std;
 
-// --- LISTA DOBLEMENTE ENLAZADA ---
 template <typename T>
 struct NodoDoble {
     T dato;

@@ -3,7 +3,6 @@
 
 using namespace std;
 
-// --- PILA (STACK LIFO) ---
 template <typename T>
 struct NodoPila {
     T dato;

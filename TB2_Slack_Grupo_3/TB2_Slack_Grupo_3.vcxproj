@@ -130,10 +130,12 @@
     <ClInclude Include="Canal.h" />
     <ClInclude Include="CanalPrivado.h" />
     <ClInclude Include="CanalPublico.h" />
+    <ClInclude Include="Cola.h" />
     <ClInclude Include="ContenidoMensaje.h" />
     <ClInclude Include="Emoji.h" />
     <ClInclude Include="Estado.h" />
     <ClInclude Include="FuncionesHash.h" />
+    <ClInclude Include="HeapSort.h" />
     <ClInclude Include="Hilo.h" />
     <ClInclude Include="ListaDoble.h" />
     <ClInclude Include="Mensaje.h" />
