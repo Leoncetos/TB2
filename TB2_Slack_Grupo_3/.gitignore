@@ -1,0 +1,12 @@
+.vs/ 
+TB2_Slack_Grupo_3/.vs/ 
+TB2_Slac.*/ 
+TB2_Slack_Grupo_3/TB2_Slac.*/ 
+x64/ 
+Debug/ 
+Release/ 
+*.user 
+*.obj 
+*.tlog 
+*.lastbuildstate 
+*.json
