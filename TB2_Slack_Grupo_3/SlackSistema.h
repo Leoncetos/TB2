@@ -88,6 +88,22 @@ void ejecutarMenuPrincipal() {
             return frase;
         }
     }
+    // Divide una cadena usando un delimitador
+    vector<string> separarCadena(const string& linea, char delim) {
+        vector<string> partes;
+        string actual = "";
+        for (int i = 0; i < (int)linea.length(); i++) {
+            if (linea[i] == delim) {
+                partes.push_back(actual);
+                actual = "";
+            }
+            else if (linea[i] != '\r') {
+                actual += linea[i];
+            }
+        }
+        partes.push_back(actual);
+        return partes;
+    }
 
     int opcion = 0;
     do {
