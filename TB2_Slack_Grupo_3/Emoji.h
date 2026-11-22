@@ -1,5 +1,8 @@
 #pragma once
-#include<iostream>
+#include <string>
+#include "ContenidoMensaje.h"
+
+using namespace std;
 
 class Emoji : public ContenidoMensaje {
 private:
