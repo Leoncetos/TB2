@@ -29,6 +29,66 @@
 #include "TablaHash.h"
 
 void ejecutarMenuPrincipal() {
+
+    // Generador del dataset para las 150k datos
+    string generarContenidoAleatorio(int idMensaje, int nUsuarios, string & tipoOut) {
+        const char* verbos[] = {
+            "Revisando", "Subiendo", "Validando", "Corrigiendo", "Compilando", "Probando",
+            "Optimizando", "Documentando", "Analizando", "Desplegando", "Integrando", "Verificando",
+            "Actualizando", "Depurando", "Coordinando", "Compartiendo", "Exportando", "Consultando",
+            "Codificando", "Produciendo", "Implementando", "Ejecutando", "Recopilando"
+        };
+        const char* sustantivos[] = {
+            "el diagrama UML", "la lista doble", "el algoritmo QuickSort", "la pila de ediciones",
+            "la cola de notificaciones", "el historial en txt", "los canales privados", "el hilo recursivo",
+            "el modulo de usuarios", "la tabla hash", "el reporte de complejidad", "los permisos de acceso",
+            "la interfaz en consola", "el commit final", "las pruebas unitarias", "el parser de archivos",
+            "el ordenamiento MergeSort", "el monticulo HeapSort", "la estructura de datos", "el sprint actual",
+            "las historias de usuario", "las Funcionales", "las Epicas de la aplicacion", "el feedback de la reunion"
+        };
+        const char* complementos[] = {
+            "para la entrega de hoy", "sin errores de memoria", "segun lo acordado en reunion",
+            "antes del cierre del bloque", "con datos de prueba", "en el entorno local",
+            "con complejidad logaritmica", "para revisar en equipo", "listo para validar",
+            "con todos los casos borde", "en la rama principal", "con los filtros lambda",
+            "verificado en consola", "pendiente de aprobacion", "con formato correcto",
+            "para la reunion", "en la aplicacion", "con las Epicas", "del sprint actual"
+        };
+        const char* archivos[] = {
+            "diagrama_uml.png", "informe_tb2.pdf", "main.cpp", "estructuras.h",
+            "capturas_consola.zip", "analisis_bigo.docx", "dataset_prueba.txt", "notas_reunion.md",
+            "informe_tb1.pdf", "algoritmos_avanzado.h", "funcionalidades.cpp", "tb2.zip"
+        };
+        const char* emojis[] = {
+            "rocket", "white_check_mark", "eyes", "thumbsup", "fire", "computer", "clap", "bulb", "kisses",
+            "tree", "water", "heart", "monkey", "joy", "happy", "sad", "crying"
+        };
+
+        int modo = rand() % 10;
+        if (modo == 0) {
+            tipoOut = "archivo";
+            return string("[") + archivos[rand() % 8] + "]";
+        }
+        else if (modo == 1) {
+            tipoOut = "emoji";
+            return string(":") + emojis[rand() % 8] + ":";
+        }
+        else {
+            tipoOut = "texto";
+            string frase = string(verbos[rand() % 18]) + " " +
+                sustantivos[rand() % 20] + " " +
+                complementos[rand() % 15];
+            if (rand() % 4 == 0) {
+                int idMencion = aleatorioRango(nUsuarios) + 1;
+                frase += " @" + to_string(idMencion);
+            }
+            if (rand() % 3 == 0) {
+                frase += " (ref #" + to_string(idMensaje) + ")";
+            }
+            return frase;
+        }
+    }
+
     int opcion = 0;
     do {
         cout << "\n==========================================================\n";
