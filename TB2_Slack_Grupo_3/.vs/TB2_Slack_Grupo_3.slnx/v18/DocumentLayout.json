@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "C:\\Users\\walter\\Desktop\\proyectos\\TB2\\TB2_Slack_Grupo_3\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{D0DB6313-4FF3-E08D-28ED-2143FD9EF785}|TB2_Slack_Grupo_3.vcxproj|C:\\Users\\walter\\Desktop\\proyectos\\TB2\\TB2_Slack_Grupo_3\\Utilidades.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{D0DB6313-4FF3-E08D-28ED-2143FD9EF785}|TB2_Slack_Grupo_3.vcxproj|solutionrelative:Utilidades.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{D0DB6313-4FF3-E08D-28ED-2143FD9EF785}|TB2_Slack_Grupo_3.vcxproj|C:\\Users\\walter\\Desktop\\proyectos\\TB2\\TB2_Slack_Grupo_3\\RegistroActividad.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{D0DB6313-4FF3-E08D-28ED-2143FD9EF785}|TB2_Slack_Grupo_3.vcxproj|solutionrelative:RegistroActividad.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
@@ -39,6 +43,19 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "Utilidades.h",
+              "DocumentMoniker": "C:\\Users\\walter\\Desktop\\proyectos\\TB2\\TB2_Slack_Grupo_3\\Utilidades.h",
+              "RelativeDocumentMoniker": "Utilidades.h",
+              "ToolTip": "C:\\Users\\walter\\Desktop\\proyectos\\TB2\\TB2_Slack_Grupo_3\\Utilidades.h",
+              "RelativeToolTip": "Utilidades.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2026-11-22T20:00:21.569Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "RegistroActividad.h",
               "DocumentMoniker": "C:\\Users\\walter\\Desktop\\proyectos\\TB2\\TB2_Slack_Grupo_3\\RegistroActividad.h",
               "RelativeDocumentMoniker": "RegistroActividad.h",
@@ -51,7 +68,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "notificacion.h",
               "DocumentMoniker": "C:\\Users\\walter\\Desktop\\proyectos\\TB2\\TB2_Slack_Grupo_3\\notificacion.h",
               "RelativeDocumentMoniker": "notificacion.h",
@@ -59,12 +76,11 @@
               "RelativeToolTip": "notificacion.h",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2026-11-22T15:50:37.744Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-11-22T15:50:37.744Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "Estado.h",
               "DocumentMoniker": "C:\\Users\\walter\\Desktop\\proyectos\\TB2\\TB2_Slack_Grupo_3\\Estado.h",
               "RelativeDocumentMoniker": "Estado.h",
@@ -72,12 +88,11 @@
               "RelativeToolTip": "Estado.h",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2026-11-22T14:40:40.428Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-11-22T14:40:40.428Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "Emoji.h",
               "DocumentMoniker": "C:\\Users\\walter\\Desktop\\proyectos\\TB2\\TB2_Slack_Grupo_3\\Emoji.h",
               "RelativeDocumentMoniker": "Emoji.h",
@@ -89,7 +104,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "Rol.h",
               "DocumentMoniker": "C:\\Users\\walter\\Desktop\\proyectos\\TB2\\TB2_Slack_Grupo_3\\Rol.h",
               "RelativeDocumentMoniker": "Rol.h",
@@ -101,7 +116,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 6,
               "Title": "Main.cpp",
               "DocumentMoniker": "C:\\Users\\walter\\Desktop\\proyectos\\TB2\\TB2_Slack_Grupo_3\\Main.cpp",
               "RelativeDocumentMoniker": "Main.cpp",

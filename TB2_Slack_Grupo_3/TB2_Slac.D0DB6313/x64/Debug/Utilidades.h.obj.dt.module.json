@@ -1,0 +1,14 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "TB2_Slac.D0DB6313\\x64\\Debug\\Utilidades.obj",
+            "outputs": [
+                "TB2_Slac.D0DB6313\\x64\\Debug\\Utilidades.h.obj.dt.module.json",
+                "TB2_Slac.D0DB6313\\x64\\Debug\\Utilidades.h.obj.dt.d.json"
+            ],
+            "requires": []
+        }
+    ]
+}
