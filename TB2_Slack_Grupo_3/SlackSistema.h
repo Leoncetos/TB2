@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <ctime>
-
+//Clases
 #include "Amistad.h"
 #include "Canal.h"
 #include "CanalPrivado.h"
@@ -24,6 +24,9 @@
 #include "RegistroActividad.h"
 #include "Rol.h"
 #include "Usuario.h"
+//Funciones extra
+#include "FuncionesHash.h"
+#include "TablaHash.h"
 
 void ejecutarMenuPrincipal() {
     int opcion = 0;
