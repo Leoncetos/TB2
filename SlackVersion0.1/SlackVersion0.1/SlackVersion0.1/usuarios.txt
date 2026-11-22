@@ -1,5 +1,0 @@
-1|John Arias|john@upc.edu.pe|activo|Admin
-2|Rodrigo Mallqui|rodrigo@utec.edu.pe|activo|Miembro
-3|Abraham Sopla|abraham@utp.edu.pe|activo|Miembro
-4|Jaime Rojas Pintado|usuario4@local|activo|Miembro
-5|Camila Rojas|usuario5@local|ausente|Miembro

@@ -1,3 +1,0 @@
-1|John Arias|john@upc.edu.pe|activo|Admin
-2|Rodrigo Mallqui|rodrigo@utec.edu.pe|activo|Miembro
-3|Abraham Sopla|abraham@utp.edu.pe|ausente|Miembro

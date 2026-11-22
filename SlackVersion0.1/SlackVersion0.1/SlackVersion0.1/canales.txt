@@ -1,5 +1,0 @@
-1|general|privado|3|1
-2|proyecto-tb1|publico|4|
-3|dudas-algoritmos|publico|3|
-4|1|publico|0|
-5|algoritmos y estructuras|publico|0|

@@ -1,7 +1,0 @@
-C:\Users\MSI\Downloads\Cosas de la U\2026 - 02\TP1\SlackVersion0.1\SlackVersion0.1\x64\Debug\SlackVersion0.1.vcxproj.AssemblyReference.cache
-C:\Users\HP\Downloads\SlackVersion0.1\SlackVersion0.1\SlackVersion0.1\x64\Debug\SlackVersion0.1.vcxproj.AssemblyReference.cache
-C:\Users\MSI\Downloads\Cosas de la U\2026 - 02\Algoritmo\TB_Slack\SlackVersion0.1\SlackVersion0.1\x64\Debug\SlackVersion0.1.vcxproj.AssemblyReference.cache
-C:\Users\MSI\Downloads\Cosas de la U\2026 - 02\Algoritmo\Casi entrega\TB_Slack_System\SlackVersion0.1\SlackVersion0.1\x64\Debug\SlackVersion0.1.vcxproj.AssemblyReference.cache
-C:\Users\HP\Downloads\TB_Slack_System\SlackVersion0.1\SlackVersion0.1\x64\Debug\SlackVersion0.1.vcxproj.AssemblyReference.cache
-C:\Users\HP\Downloads\SlackVersion0.1\SlackVersion0.1\x64\Debug\SlackVersion0.1.vcxproj.AssemblyReference.cache
-C:\Users\HP\Downloads\SlackVersion0.1\SlackVersion0.1\x64\Debug\SlackVersion0.1.exe
