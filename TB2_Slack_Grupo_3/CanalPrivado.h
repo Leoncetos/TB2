@@ -1,5 +1,7 @@
 #pragma once
-    class CanalPrivado : public Canal {
+#include "Canal.h"
+
+class CanalPrivado : public Canal {
     private:
         vector<int> usuariosPermitidos;
 

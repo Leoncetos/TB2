@@ -1,5 +1,5 @@
 #pragma once
-#include <iostream>
+#include "ContenidoMensaje.h"
 
 class MensajeTexto : public ContenidoMensaje {
 private:

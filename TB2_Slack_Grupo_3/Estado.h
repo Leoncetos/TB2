@@ -1,9 +1,7 @@
 #pragma once
 #include <iostream>
 
-
 using namespace std;
-
 
 class Estado {
 public:

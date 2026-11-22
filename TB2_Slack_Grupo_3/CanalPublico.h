@@ -1,4 +1,6 @@
 #pragma once
+#include "Canal.h"
+
 class CanalPublico : public Canal {
     public:
         CanalPublico(int id = 0, string nombre = "", int cantMsgs = 0)
