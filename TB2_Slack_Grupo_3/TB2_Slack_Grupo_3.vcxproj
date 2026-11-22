@@ -123,7 +123,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Slack_UPC_2026_2_TB2_Final_Final_Corregido.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Amistad.h" />
