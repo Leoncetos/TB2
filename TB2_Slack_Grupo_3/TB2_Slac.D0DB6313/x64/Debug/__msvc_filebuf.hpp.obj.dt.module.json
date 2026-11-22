@@ -1,0 +1,14 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "TB2_Slac.D0DB6313\\x64\\Debug\\__msvc_filebuf.obj",
+            "outputs": [
+                "TB2_Slac.D0DB6313\\x64\\Debug\\__msvc_filebuf.hpp.obj.dt.module.json",
+                "TB2_Slac.D0DB6313\\x64\\Debug\\__msvc_filebuf.hpp.obj.dt.d.json"
+            ],
+            "requires": []
+        }
+    ]
+}

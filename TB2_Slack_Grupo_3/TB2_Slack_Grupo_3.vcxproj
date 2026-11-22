@@ -125,6 +125,21 @@
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Amistad.h" />
+    <ClInclude Include="Canal.h" />
+    <ClInclude Include="CanalPrivado.h" />
+    <ClInclude Include="CanalPublico.h" />
+    <ClInclude Include="ContenidoMensaje.h" />
+    <ClInclude Include="Emoji.h" />
+    <ClInclude Include="Estado.h" />
+    <ClInclude Include="Hilo.h" />
+    <ClInclude Include="Mensaje.h" />
+    <ClInclude Include="MensajeArchivo.h" />
+    <ClInclude Include="MensajeTexto.h" />
+    <ClInclude Include="Rol.h" />
+    <ClInclude Include="Usuario.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
