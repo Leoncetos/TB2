@@ -430,12 +430,12 @@ public:
                     return m.idCanal == idC;
                     }, -1, false);
 
-                /*if (!msgsCanal.empty()) {
+                if (!msgsCanal.empty()) {
                     mergeSort(msgsCanal, 0, (int)msgsCanal.size() - 1, [](const Mensaje& a, const Mensaje& b) {
                         if (a.fecha != b.fecha) return a.fecha < b.fecha;
                         return a.id < b.id;
                         });
-                }*/
+                }
 
                 for (const auto& m : msgsCanal) {
                     Usuario** u = indiceUsuarios.buscar(m.idAutor);
