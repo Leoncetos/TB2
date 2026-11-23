@@ -8,7 +8,9 @@
 #include <algorithm>
 #include <cstdlib>
 #include <ctime>
-#include <limits>
+#include <sstream>
+
+using namespace std;
 
 // Clases
 #include "Amistad.h"
@@ -38,8 +40,6 @@
 //Ordenamientos avanzados
 #include "QuickSort.h"
 #include "HeapSort.h"
-
-using namespace std;
 
 class SlackSistema {
 private:
@@ -73,13 +73,14 @@ private:
     }
 
     int leerEnteroSeguro() {
-        int val;
-        if (!(cin >> val)) {
-            cin.clear();
-            cin.ignore(10000, '\n');
-            return -1;
-        }
-        return val;
+        string linea;
+        if (!getline(cin, linea)) return -1;
+
+        istringstream entrada(linea);
+        int valor;
+        char sobrante;
+        if (!(entrada >> valor) || (entrada >> sobrante)) return -1;
+        return valor;
     }
 
     void registrarLog(int idUsuario, const string& accion, const string& detalle) {
@@ -387,8 +388,8 @@ public:
             cout << "0. Volver\n";
             cout << "Elige una opcion: ";
             op = leerEnteroSeguro();
+            if (!cin) return;
             if (op == -1) continue;
-            cin.ignore();
 
             if (op == 1) {
                 int idC, idU;
@@ -396,7 +397,6 @@ public:
                 idC = leerEnteroSeguro();
                 cout << "ID del usuario que ingresa: ";
                 idU = leerEnteroSeguro();
-                cin.ignore();
 
                 Canal** ptrC = indiceCanales.buscar(idC);
                 if (ptrC == nullptr) {
@@ -448,7 +448,6 @@ public:
 
                 cout << "Tipo (1 = Publico, 2 = Privado): ";
                 tipoOp = leerEnteroSeguro();
-                cin.ignore();
 
                 int idNuevo = nextCanalId++;
                 Canal* nuevo = nullptr;
@@ -456,7 +455,6 @@ public:
                     int idCreador;
                     cout << "ID del usuario inicial autorizado: ";
                     idCreador = leerEnteroSeguro();
-                    cin.ignore();
                     nuevo = new CanalPrivado(idNuevo, nom, 0, vector<int>{idCreador});
                 }
                 else {
@@ -474,7 +472,6 @@ public:
                 idC = leerEnteroSeguro();
                 cout << "ID del usuario a autorizar: ";
                 idU = leerEnteroSeguro();
-                cin.ignore();
 
                 Canal** ptrC = indiceCanales.buscar(idC);
                 if (ptrC != nullptr && (*ptrC)->getTipo() == "privado") {
@@ -494,7 +491,6 @@ public:
                 int idC;
                 cout << "ID del canal a cambiar tipo: ";
                 idC = leerEnteroSeguro();
-                cin.ignore();
 
                 Canal** ptrC = indiceCanales.buscar(idC);
                 if (ptrC != nullptr) {
@@ -532,6 +528,100 @@ public:
                 }
                 else {
                     cout << "No se encontro ningun canal con el nombre " << nomBuscar << ".\n";
+                }
+            }
+        } while (op != 0);
+    }
+
+    // ------------------------------------------------------------------------
+    // OPCIÓN 2: MENÚ USUARIOS
+    // ------------------------------------------------------------------------
+    void menuUsuarios() {
+        int op = 0;
+        do {
+            cout << "\n================ USUARIOS ================\n";
+            cout << "1. Listar usuarios\n";
+            cout << "2. Registrar nuevo usuario\n";
+            cout << "3. Alternar rol (Admin / Miembro)\n";
+            cout << "4. Alternar estado (activo / ausente)\n";
+            cout << "5. Crear amistad entre dos usuarios (A - B)\n";
+            cout << "0. Volver\n";
+            cout << "Opcion: ";
+            op = leerEnteroSeguro();
+            if (!cin) return;
+            if (op == -1) continue;
+
+            if (op == 1) {
+                auto listaU = usuarios.filtrar([](const Usuario&) { return true; }, -1, false);
+                for (const auto& u : listaU) {
+                    cout << "[" << u.id << "] " << u.nombre << " <" << u.email << "> (" << u.estado << ", " << u.rol << ")\n";
+                }
+            }
+            else if (op == 2) {
+                string nom, mail, est, rol;
+                cout << "Nombre completo: "; getline(cin, nom);
+                cout << "Correo: "; getline(cin, mail);
+                cout << "Estado inicial (activo/ausente): "; getline(cin, est);
+                cout << "Rol inicial (Admin/Miembro): "; getline(cin, rol);
+
+                int id = nextUserId++;
+                Usuario nuevo(id, nom, mail, est, rol);
+                Usuario* ptrU = usuarios.insertarFinal(nuevo);
+                indiceUsuarios.insertar(id, ptrU);
+                estados.insertarFinal(Estado(id, id, est, est == "activo" ? ":online:" : ":away:"));
+                registrarLog(id, "REGISTRO_USUARIO", "Se registro " + nom);
+                cout << "OK: Usuario registrado con ID #" << id << ".\n";
+            }
+            else if (op == 3) {
+                int idU;
+                cout << "ID del usuario: ";
+                idU = leerEnteroSeguro();
+                Usuario** ptrU = indiceUsuarios.buscar(idU);
+                if (ptrU != nullptr) {
+                    Usuario* u = *ptrU;
+                    u->rol = (u->rol == "Admin") ? "Miembro" : "Admin";
+                    registrarLog(idU, "CAMBIO_ROL", "Nuevo rol: " + u->rol);
+                    cout << "OK: Rol de " << u->nombre << " cambiado a " << u->rol << ".\n";
+                }
+                else {
+                    cout << "Usuario no encontrado.\n";
+                }
+            }
+            else if (op == 4) {
+                int idU;
+                cout << "ID del usuario: ";
+                idU = leerEnteroSeguro();
+                Usuario** ptrU = indiceUsuarios.buscar(idU);
+                if (ptrU != nullptr) {
+                    Usuario* u = *ptrU;
+                    u->estado = (u->estado == "activo") ? "ausente" : "activo";
+                    estados.insertarFinal(Estado(estados.getTamano() + 1, idU, u->estado, u->estado == "activo" ? ":online:" : ":away:"));
+                    registrarLog(idU, "CAMBIO_ESTADO", "Nuevo estado: " + u->estado);
+                    cout << "OK: Estado de " << u->nombre << " cambiado a " << u->estado << ".\n";
+                }
+                else {
+                    cout << "Usuario no encontrado.\n";
+                }
+            }
+            else if (op == 5) {
+                int u1, u2;
+                cout << "ID Usuario 1: "; u1 = leerEnteroSeguro();
+                cout << "ID Usuario 2: "; u2 = leerEnteroSeguro();
+                if (u1 == u2 || indiceUsuarios.buscar(u1) == nullptr || indiceUsuarios.buscar(u2) == nullptr) {
+                    cout << "IDs invalidos o iguales.\n";
+                }
+                else {
+                    auto existe = amistades.buscarPtr([u1, u2](const Amistad& a) {
+                        return (a.idUsuario1 == u1 && a.idUsuario2 == u2) || (a.idUsuario1 == u2 && a.idUsuario2 == u1);
+                        }, false);
+                    if (existe != nullptr) {
+                        cout << "La amistad entre #" << u1 << " y #" << u2 << " ya existe.\n";
+                    }
+                    else {
+                        amistades.insertarFinal(Amistad(nextAmistadId++, u1, u2));
+                        registrarLog(u1, "NUEVA_AMISTAD", "Amistad entre #" + to_string(u1) + " y #" + to_string(u2));
+                        cout << "OK: Amistad creada entre Usuario #" << u1 << " y Usuario #" << u2 << ".\n";
+                    }
                 }
             }
         } while (op != 0);
@@ -618,18 +708,16 @@ public:
             cout << "==========================================================\n";
             cout << "Selecciona una opcion: ";
 
-            if (!(cin >> opcion)) {
-                cin.clear();
-                cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                opcion = -1;
+            opcion = leerEnteroSeguro();
+            if (!cin) return;
+            if (opcion == -1) {
                 cout << "Entrada invalida. Ingresa un numero.\n";
                 continue;
             }
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
             switch (opcion) {
             case 1: menuCanales(); break;
-            case 2: /*Usuarios*/ break;
+            case 2: menuUsuarios(); break;
             case 3: /*Mensajes e hilos*/ break;
             case 4: /*Historial de ediciones*/ break;
             case 5: /*Notificaciones*/ break;
