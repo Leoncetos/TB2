@@ -938,6 +938,46 @@ public:
     }
 
     // ------------------------------------------------------------------------
+    // OPCIÓN 6: ORDENAR CANALES (QUICKSORT Y TIMSORT)
+    // ------------------------------------------------------------------------
+    void menuOrdenarCanales() {
+        cout << "\n================ ORDENAR CANALES ================\n";
+        cout << "1. Por actividad / cantidad de mensajes (QuickSort)\n";
+        cout << "2. Alfabeticamente por nombre (TimSort)\n";
+        cout << "0. Volver\n";
+        cout << "Opcion: ";
+        int op = leerEnteroSeguro();
+        if (op <= 0) return;
+        cin.ignore();
+
+        vector<Canal*> vec = canales.aVector();
+        if (op == 1) {
+            if (!vec.empty()) {
+                quickSort(vec, 0, (int)vec.size() - 1, [](Canal* a, Canal* b) {
+                    return a->getCantidadMensajes() > b->getCantidadMensajes();
+                    });
+            }
+            cout << "\n>> Canales ordenados por actividad (QuickSort):\n";
+        }
+        else if (op == 2) {
+            if (!vec.empty()) {
+                timSort(vec, [](Canal* a, Canal* b) {
+                    return a->getNombre() < b->getNombre();
+                    });
+            }
+            cout << "\n>> Canales ordenados alfabeticamente (TimSort):\n";
+        }
+        else {
+            cout << "Opcion invalida.\n";
+            return;
+        }
+
+        for (int i = 0; i < (int)vec.size(); i++) {
+            cout << "Canal#" << vec[i]->getId() << " " << vec[i]->getNombre()
+                << " (" << vec[i]->getTipo() << ") - Msgs: " << vec[i]->getCantidadMensajes() << "\n";
+        }
+    }
+    // ------------------------------------------------------------------------
     // OPCIÓN 11: RESUMEN GENERAL
     // ------------------------------------------------------------------------
     void resumenGeneral() {
@@ -1028,10 +1068,10 @@ public:
             switch (opcion) {
             case 1: menuCanales(); break;
             case 2: menuUsuarios(); break;
-            case 3: /*Mensajes e hilos*/ break;
-            case 4: /*Historial de ediciones*/ break;
-            case 5: /*Notificaciones*/ break;
-            case 6: /*Ord canales*/ break;
+            case 3: menuMensajes(); break;
+            case 4: menuEdiciones(); break;
+            case 5: menuNotificaciones(); break;
+            case 6: menuOrdenarCanales(); break;
             case 7: /*Ord usuarios*/ break;
             case 8: /*Ord mensajes*/ break;
             case 9: /*Guardar datos*/ break;
