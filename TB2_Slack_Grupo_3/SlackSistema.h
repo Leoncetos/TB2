@@ -980,6 +980,276 @@ public:
         }
     }
     // ------------------------------------------------------------------------
+    // OPCIÓN 7: ORDENAR USUARIOS (MERGESORT Y QUICKSORT)
+    // ------------------------------------------------------------------------
+    void menuOrdenarUsuarios() {
+        cout << "\n================ ORDENAR USUARIOS ================\n";
+        cout << "1. Alfabeticamente por nombre (MergeSort)\n";
+        cout << "2. Por rol y nombre (QuickSort)\n";
+        cout << "0. Volver\n";
+        cout << "Opcion: ";
+        int op = leerEnteroSeguro();
+        if (op <= 0) return;
+        cin.ignore();
+
+        vector<Usuario> vec = usuarios.aVector();
+        if (op == 1) {
+            if (!vec.empty()) {
+                mergeSort(vec, 0, (int)vec.size() - 1, [](const Usuario& a, const Usuario& b) {
+                    return a.nombre <= b.nombre;
+                    });
+            }
+            cout << "\n>> Usuarios ordenados alfabeticamente (MergeSort):\n";
+        }
+        else if (op == 2) {
+            if (!vec.empty()) {
+                quickSort(vec, 0, (int)vec.size() - 1, [](const Usuario& a, const Usuario& b) {
+                    if (a.rol != b.rol) return a.rol < b.rol;
+                    return a.nombre < b.nombre;
+                    });
+            }
+            cout << "\n>> Usuarios ordenados por rol y nombre (QuickSort):\n";
+        }
+        else {
+            cout << "Opcion invalida.\n";
+            return;
+        }
+
+        for (int i = 0; i < (int)vec.size(); i++) {
+            cout << "[" << vec[i].id << "] " << vec[i].nombre << " <" << vec[i].email
+                << "> (" << vec[i].estado << ", " << vec[i].rol << ")\n";
+        }
+    }
+
+    // ------------------------------------------------------------------------
+    // OPCIÓN 8: ORDENAR MENSAJES (HEAPSORT Y TIMSORT)
+    // ------------------------------------------------------------------------
+    void menuOrdenarMensajes() {
+        cout << "\n================ ORDENAR MENSAJES ================\n";
+        cout << "1. Cronologicamente por fecha (HeapSort)\n";
+        cout << "2. Por canal y fecha (TimSort)\n";
+        cout << "0. Volver\n";
+        cout << "Opcion: ";
+        int op = leerEnteroSeguro();
+        if (op <= 0) return;
+        cin.ignore();
+
+        vector<Mensaje> vec = mensajes.aVector();
+        if (op == 1) {
+            if (!vec.empty()) {
+                heapSort(vec, [](const Mensaje& a, const Mensaje& b) {
+                    return a.fecha < b.fecha;
+                    });
+            }
+            cout << "\n>> Mensajes ordenados cronologicamente (HeapSort):\n";
+        }
+        else if (op == 2) {
+            if (!vec.empty()) {
+                timSort(vec, [](const Mensaje& a, const Mensaje& b) {
+                    if (a.idCanal != b.idCanal) return a.idCanal < b.idCanal;
+                    return a.fecha < b.fecha;
+                    });
+            }
+            cout << "\n>> Mensajes ordenados por canal y fecha (TimSort):\n";
+        }
+        else {
+            cout << "Opcion invalida.\n";
+            return;
+        }
+
+        for (int i = 0; i < (int)vec.size(); i++) {
+            cout << "Msg#" << vec[i].id << " [Canal:" << vec[i].idCanal << ", Autor:" << vec[i].idAutor
+                << "] " << vec[i].fecha << ": " << vec[i].contenido << "\n";
+        }
+    }
+
+    // ------------------------------------------------------------------------
+    // OPCIÓN 9 Y 10: PERSISTENCIA EN ARCHIVOS .TXT
+    // ------------------------------------------------------------------------
+    void guardarDatos() {
+        ofstream fU("usuarios.txt"), fC("canales.txt"), fM("mensajes.txt"),
+            fA("amistades.txt"), fAct("actividad.txt"),
+            fE("ediciones.txt"), fN("notificaciones.txt");
+
+        for (const auto& u : usuarios.aVector()) {
+            fU << u.id << "|" << u.nombre << "|" << u.email << "|" << u.estado << "|" << u.rol << "\n";
+        }
+
+        for (Canal* c : canales.aVector()) {
+            fC << c->getId() << "|" << c->getNombre() << "|" << c->getTipo() << "|" << c->getCantidadMensajes() << "|";
+            vector<int> accesos = c->getAccesos();
+            for (int i = 0; i < (int)accesos.size(); i++) {
+                if (i > 0) fC << ",";
+                fC << accesos[i];
+            }
+            fC << "\n";
+        }
+
+        for (const auto& m : mensajes.aVector()) {
+            fM << m.id << "|" << m.idAutor << "|" << m.idCanal << "|" << m.idPadre << "|"
+                << m.tipoContenido << "|" << m.contenido << "|" << m.fecha << "\n";
+        }
+
+        for (const auto& am : amistades.aVector()) {
+            fA << am.id << "|" << am.idUsuario1 << "|" << am.idUsuario2 << "\n";
+        }
+
+        for (const auto& ac : actividad.aVector()) {
+            fAct << ac.id << "|" << ac.idUsuario << "|" << ac.fecha << "|" << ac.accion << "|" << ac.detalle << "\n";
+        }
+
+        // Guardar pila de ediciones desde el fondo hacia la cima para restaurarla en el mismo orden
+        vector<Mensaje> listaEdiciones = ediciones.listarTodos(-1);
+        for (int i = (int)listaEdiciones.size() - 1; i >= 0; i--) {
+            const auto& e = listaEdiciones[i];
+            fE << e.id << "|" << e.idAutor << "|" << e.idCanal << "|" << e.idPadre << "|"
+                << e.tipoContenido << "|" << e.contenido << "|" << e.fecha << "\n";
+        }
+
+        for (const auto& n : notificaciones.listarTodos(-1)) {
+            fN << n.id << "|" << n.idUsuario << "|" << n.idMensaje << "|" << n.tipo << "|" << (n.leida ? 1 : 0) << "\n";
+        }
+
+        cout << "\nOK: Datos guardados en usuarios.txt, canales.txt, mensajes.txt, amistades.txt, actividad.txt, ediciones.txt y notificaciones.txt\n";
+    }
+
+    void cargarDatos() {
+        ifstream fU("usuarios.txt"), fC("canales.txt"), fM("mensajes.txt"),
+            fA("amistades.txt"), fAct("actividad.txt"),
+            fE("ediciones.txt"), fN("notificaciones.txt");
+        if (!fU.is_open() || !fC.is_open() || !fM.is_open()) {
+            cout << "No se encontraron archivos previos guardados. Use la opcion 9 primero.\n";
+            return;
+        }
+
+        liberarCanales();
+        usuarios.limpiar();
+        indiceUsuarios.limpiar();
+        mensajes.limpiar();
+        hilos.limpiar();
+        amistades.limpiar();
+        actividad.limpiar();
+        ediciones.limpiar();
+        notificaciones.limpiar();
+
+        int maxUserId = 0;
+        int maxCanalId = 0;
+        int maxMensajeId = 0;
+        int maxAmistadId = 0;
+        int maxActId = 0;
+        int maxNotifId = 0;
+        nextHiloId = 1;
+
+        string linea;
+        while (getline(fU, linea)) {
+            if (linea.empty()) continue;
+            auto p = separarCadena(linea, '|');
+            if (p.size() >= 5) {
+                int id = stoi(p[0]);
+                Usuario u(id, p[1], p[2], p[3], p[4]);
+                Usuario* ptrU = usuarios.insertarFinal(u);
+                indiceUsuarios.insertar(id, ptrU);
+                if (id > maxUserId) maxUserId = id;
+            }
+        }
+
+        while (getline(fC, linea)) {
+            if (linea.empty()) continue;
+            auto p = separarCadena(linea, '|');
+            if (p.size() >= 4) {
+                int id = stoi(p[0]);
+                Canal* c = nullptr;
+                if (p[2] == "privado") {
+                    vector<int> permitidos;
+                    if (p.size() >= 5 && !p[4].empty()) {
+                        auto ids = separarCadena(p[4], ',');
+                        for (const auto& sId : ids) {
+                            if (!sId.empty()) permitidos.push_back(stoi(sId));
+                        }
+                    }
+                    if (permitidos.empty()) permitidos.push_back(1);
+                    c = new CanalPrivado(id, p[1], stoi(p[3]), permitidos);
+                }
+                else {
+                    c = new CanalPublico(id, p[1], stoi(p[3]));
+                }
+                canales.insertarFinal(c);
+                indiceCanales.insertar(id, c);
+                indiceCanalesNombre.insertar(c->getNombre(), c);
+                if (id > maxCanalId) maxCanalId = id;
+            }
+        }
+
+        while (getline(fM, linea)) {
+            if (linea.empty()) continue;
+            auto p = separarCadena(linea, '|');
+            if (p.size() >= 7) {
+                int id = stoi(p[0]);
+                int padre = stoi(p[3]);
+                mensajes.insertarFinal(Mensaje(id, stoi(p[1]), stoi(p[2]), padre, p[4], p[5], p[6]));
+                if (padre > 0) {
+                    hilos.insertarFinal(Hilo(nextHiloId++, padre));
+                }
+                if (id > maxMensajeId) maxMensajeId = id;
+            }
+        }
+
+        if (fA.is_open()) {
+            while (getline(fA, linea)) {
+                if (linea.empty()) continue;
+                auto p = separarCadena(linea, '|');
+                if (p.size() >= 3) {
+                    int id = stoi(p[0]);
+                    amistades.insertarFinal(Amistad(id, stoi(p[1]), stoi(p[2])));
+                    if (id > maxAmistadId) maxAmistadId = id;
+                }
+            }
+        }
+
+        if (fAct.is_open()) {
+            while (getline(fAct, linea)) {
+                if (linea.empty()) continue;
+                auto p = separarCadena(linea, '|');
+                if (p.size() >= 5) {
+                    int id = stoi(p[0]);
+                    actividad.insertarFinal(RegistroActividad(id, stoi(p[1]), p[2], p[3], p[4]));
+                    if (id > maxActId) maxActId = id;
+                }
+            }
+        }
+
+        if (fE.is_open()) {
+            while (getline(fE, linea)) {
+                if (linea.empty()) continue;
+                auto p = separarCadena(linea, '|');
+                if (p.size() >= 7) {
+                    ediciones.push(Mensaje(stoi(p[0]), stoi(p[1]), stoi(p[2]), stoi(p[3]), p[4], p[5], p[6]));
+                }
+            }
+        }
+
+        if (fN.is_open()) {
+            while (getline(fN, linea)) {
+                if (linea.empty()) continue;
+                auto p = separarCadena(linea, '|');
+                if (p.size() >= 5) {
+                    int id = stoi(p[0]);
+                    notificaciones.encolar(Notificacion(id, stoi(p[1]), stoi(p[2]), p[3], stoi(p[4]) != 0));
+                    if (id > maxNotifId) maxNotifId = id;
+                }
+            }
+        }
+
+        nextUserId = maxUserId + 1;
+        nextCanalId = maxCanalId + 1;
+        nextMensajeId = maxMensajeId + 1;
+        nextAmistadId = maxAmistadId + 1;
+        nextActId = maxActId + 1;
+        nextNotifId = maxNotifId + 1;
+
+        cout << "\nOK: Colecciones reconstruidas desde los archivos .txt.\n";
+    }
+    // ------------------------------------------------------------------------
     // OPCIÓN 11: RESUMEN GENERAL
     // ------------------------------------------------------------------------
     void resumenGeneral() {
@@ -1074,10 +1344,10 @@ public:
             case 4: menuEdiciones(); break;
             case 5: menuNotificaciones(); break;
             case 6: menuOrdenarCanales(); break;
-            case 7: /*Ord usuarios*/ break;
-            case 8: /*Ord mensajes*/ break;
-            case 9: /*Guardar datos*/ break;
-            case 10: /*Cargar datos*/ break;
+            case 7: menuOrdenarUsuarios(); break;
+            case 8: menuOrdenarMensajes(); break;
+            case 9: guardarDatos(); break;
+            case 10: cargarDatos(); break;
             case 11: resumenGeneral(); break;
             case 12: verRegistroActividad(); break;
             case 0: cout << "Saliendo de Slack - UPC 2026-2...\n"; break;
