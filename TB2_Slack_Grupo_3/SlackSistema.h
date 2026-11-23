@@ -367,7 +367,179 @@ public:
         cout << "  - Notificaciones:         " << notificaciones.getTamano() << "\n";
         cout << "  - Historial de ediciones: " << ediciones.getTamano() << "\n";
     }
+    // ------------------------------------------------------------------------
+    // OPCIÓN 1: MENÚ CANALES
+    // ------------------------------------------------------------------------
+    void menuCanales() {
+        int op = 0;
+        do {
+            cout << "\nCANALES\n";
+            auto listaC = canales.filtrar([](Canal*) { return true; }, -1, false);
+            for (const auto& c : listaC) {
+                cout << "[" << c->getId() << "] " << c->getNombre() << " | " << c->getTipo()
+                    << " | " << c->getCantidadMensajes() << " mensajes\n";
+            }
+            cout << "1. Abrir canal\n";
+            cout << "2. Crear canal\n";
+            cout << "3. Agregar usuario a canal privado\n";
+            cout << "4. Cambiar tipo publico/privado\n";
+            cout << "5. Buscar canal por nombre (Hash String O(1))\n";
+            cout << "0. Volver\n";
+            cout << "Elige una opcion: ";
+            op = leerEnteroSeguro();
+            if (op == -1) continue;
+            cin.ignore();
 
+            if (op == 1) {
+                int idC, idU;
+                cout << "ID del canal que deseas abrir: ";
+                idC = leerEnteroSeguro();
+                cout << "ID del usuario que ingresa: ";
+                idU = leerEnteroSeguro();
+                cin.ignore();
+
+                Canal** ptrC = indiceCanales.buscar(idC);
+                if (ptrC == nullptr) {
+                    cout << "Error: Canal no encontrado.\n";
+                    continue;
+                }
+                Canal* canal = *ptrC;
+
+                if (!canal->puedeEntrar(idU)) {
+                    cout << "ACCESO DENEGADO: El canal " << canal->getNombre() << " es privado y el usuario #" << idU << " no tiene permiso.\n";
+                    registrarLog(idU, "ACCESO_DENEGADO", "Intento abrir canal privado #" + to_string(idC));
+                    continue;
+                }
+
+                cout << "\n" << canal->getNombre() << " (" << canal->getTipo() << ")\n";
+                auto msgsCanal = mensajes.filtrar([idC](const Mensaje& m) {
+                    return m.idCanal == idC;
+                    }, -1, false);
+
+                /*if (!msgsCanal.empty()) {
+                    mergeSort(msgsCanal, 0, (int)msgsCanal.size() - 1, [](const Mensaje& a, const Mensaje& b) {
+                        if (a.fecha != b.fecha) return a.fecha < b.fecha;
+                        return a.id < b.id;
+                        });
+                }*/
+
+                for (const auto& m : msgsCanal) {
+                    Usuario** u = indiceUsuarios.buscar(m.idAutor);
+                    string nomAutor = (u != nullptr) ? (*u)->nombre : ("Usuario #" + to_string(m.idAutor));
+                    cout << nomAutor << " | " << m.fecha;
+                    if (m.idPadre > 0) cout << " | Respuesta a #" << m.idPadre;
+                    cout << "\n  " << m.contenido << "\n";
+                }
+                registrarLog(idU, "ABRIR_CANAL", "Abrio " + canal->getNombre());
+                cout << "Presiona Enter para volver a Canales...";
+                cin.get();
+            }
+            else if (op == 2) {
+                string nom;
+                int tipoOp;
+                cout << "Nombre del canal (ej. #devops): ";
+                getline(cin, nom);
+                if (!nom.empty() && nom[0] != '#') nom = "#" + nom;
+
+                if (indiceCanalesNombre.buscar(nom) != nullptr) {
+                    cout << "Error: Ya existe un canal con el nombre " << nom << ".\n";
+                    continue;
+                }
+
+                cout << "Tipo (1 = Publico, 2 = Privado): ";
+                tipoOp = leerEnteroSeguro();
+                cin.ignore();
+
+                int idNuevo = nextCanalId++;
+                Canal* nuevo = nullptr;
+                if (tipoOp == 2) {
+                    int idCreador;
+                    cout << "ID del usuario inicial autorizado: ";
+                    idCreador = leerEnteroSeguro();
+                    cin.ignore();
+                    nuevo = new CanalPrivado(idNuevo, nom, 0, vector<int>{idCreador});
+                }
+                else {
+                    nuevo = new CanalPublico(idNuevo, nom, 0);
+                }
+                canales.insertarFinal(nuevo);
+                indiceCanales.insertar(idNuevo, nuevo);
+                indiceCanalesNombre.insertar(nom, nuevo);
+                registrarLog(1, "CREAR_CANAL", "Creo canal " + nom + " (" + nuevo->getTipo() + ")");
+                cout << "OK: Canal " << nom << " creado con ID #" << idNuevo << ".\n";
+            }
+            else if (op == 3) {
+                int idC, idU;
+                cout << "ID del canal privado: ";
+                idC = leerEnteroSeguro();
+                cout << "ID del usuario a autorizar: ";
+                idU = leerEnteroSeguro();
+                cin.ignore();
+
+                Canal** ptrC = indiceCanales.buscar(idC);
+                if (ptrC != nullptr && (*ptrC)->getTipo() == "privado") {
+                    if ((*ptrC)->agregarUsuario(idU)) {
+                        registrarLog(idU, "AGREGAR_ACCESO", "Usuario #" + to_string(idU) + " agregado a canal #" + to_string(idC));
+                        cout << "OK: Usuario #" << idU << " autorizado en " << (*ptrC)->getNombre() << ".\n";
+                    }
+                    else {
+                        cout << "El usuario ya tenia acceso.\n";
+                    }
+                }
+                else {
+                    cout << "El canal no existe o no es privado.\n";
+                }
+            }
+            else if (op == 4) {
+                int idC;
+                cout << "ID del canal a cambiar tipo: ";
+                idC = leerEnteroSeguro();
+                cin.ignore();
+
+                Canal** ptrC = indiceCanales.buscar(idC);
+                if (ptrC != nullptr) {
+                    Canal* actual = *ptrC;
+                    Canal* reemplazo = nullptr;
+                    if (actual->getTipo() == "publico") {
+                        reemplazo = new CanalPrivado(actual->getId(), actual->getNombre(), actual->getCantidadMensajes(), vector<int>{1});
+                    }
+                    else {
+                        reemplazo = new CanalPublico(actual->getId(), actual->getNombre(), actual->getCantidadMensajes());
+                    }
+                    *ptrC = reemplazo;
+                    indiceCanalesNombre.insertar(reemplazo->getNombre(), reemplazo);
+                    Canal** nodoEnLista = canales.buscarPtr([idC](Canal* c) { return c->getId() == idC; }, false);
+                    if (nodoEnLista != nullptr) *nodoEnLista = reemplazo;
+                    delete actual;
+                    registrarLog(1, "CAMBIAR_TIPO_CANAL", "Canal #" + to_string(idC) + " cambiado a " + reemplazo->getTipo());
+                    cout << "OK: Tipo de canal actualizado a '" << reemplazo->getTipo() << "'.\n";
+                }
+                else {
+                    cout << "Canal no encontrado.\n";
+                }
+            }
+            else if (op == 5) {
+                string nomBuscar;
+                cout << "Nombre exacto del canal (ej. #general-1): ";
+                getline(cin, nomBuscar);
+                if (!nomBuscar.empty() && nomBuscar[0] != '#') nomBuscar = "#" + nomBuscar;
+
+                Canal** ptrC = indiceCanalesNombre.buscar(nomBuscar);
+                if (ptrC != nullptr) {
+                    Canal* c = *ptrC;
+                    cout << "Encontrado -> [" << c->getId() << "] " << c->getNombre()
+                        << " | " << c->getTipo() << " | " << c->getCantidadMensajes() << " mensajes\n";
+                }
+                else {
+                    cout << "No se encontro ningun canal con el nombre " << nomBuscar << ".\n";
+                }
+            }
+        } while (op != 0);
+    }
+
+    // ------------------------------------------------------------------------
+    // OPCIÓN 11: RESUMEN GENERAL
+    // ------------------------------------------------------------------------
     void resumenGeneral() {
         long total = (long)usuarios.getTamano() +
             (long)canales.getTamano() +
@@ -417,6 +589,9 @@ public:
         }
     }
 
+    // ------------------------------------------------------------------------
+    // MENÚ PRINCIPAL DEL SISTEMA
+    // ------------------------------------------------------------------------
     void ejecutarMenuPrincipal() {
         int opcion = 0;
         do {
@@ -453,7 +628,7 @@ public:
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
             switch (opcion) {
-            case 1: /*Canales*/ break;
+            case 1: menuCanales(); break;
             case 2: /*Usuarios*/ break;
             case 3: /*Mensajes e hilos*/ break;
             case 4: /*Historial de ediciones*/ break;
@@ -463,8 +638,8 @@ public:
             case 8: /*Ord mensajes*/ break;
             case 9: /*Guardar datos*/ break;
             case 10: /*Cargar datos*/ break;
-            case 11: /*Resumen general*/ break;
-            case 12: /*Registro de actividad*/ break;
+            case 11: resumenGeneral(); break;
+            case 12: verRegistroActividad(); break;
             case 0: cout << "Saliendo de Slack - UPC 2026-2...\n"; break;
             default: cout << "Opcion invalida.\n"; break;
             }
