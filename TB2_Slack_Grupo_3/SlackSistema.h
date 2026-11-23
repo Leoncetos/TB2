@@ -40,6 +40,8 @@ using namespace std;
 //Ordenamientos avanzados
 #include "QuickSort.h"
 #include "HeapSort.h"
+#include "MergeSort.h"
+#include "TimSort.h"
 
 class SlackSistema {
 private:

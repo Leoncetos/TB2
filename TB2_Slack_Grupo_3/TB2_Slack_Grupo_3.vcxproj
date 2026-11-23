@@ -141,6 +141,7 @@
     <ClInclude Include="Mensaje.h" />
     <ClInclude Include="MensajeArchivo.h" />
     <ClInclude Include="MensajeTexto.h" />
+    <ClInclude Include="MergeSort.h" />
     <ClInclude Include="notificacion.h" />
     <ClInclude Include="Pila.h" />
     <ClInclude Include="QuickSort.h" />
@@ -148,6 +149,7 @@
     <ClInclude Include="Rol.h" />
     <ClInclude Include="SlackSistema.h" />
     <ClInclude Include="TablaHash.h" />
+    <ClInclude Include="TimSort.h" />
     <ClInclude Include="Usuario.h" />
     <ClInclude Include="Utilidades.h" />
   </ItemGroup>
