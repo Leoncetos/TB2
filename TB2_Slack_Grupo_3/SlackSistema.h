@@ -89,6 +89,18 @@ private:
         ));
     }
 
+    int imprimirRespuestasRec(const vector<Mensaje>& msgsCanal, int idPadre, int nivel) {
+        int contador = 0;
+        for (const auto& m : msgsCanal) {
+            if (m.idPadre == idPadre) {
+                for (int i = 0; i < nivel; i++) cout << "    |--- ";
+                cout << "[Respuesta #" << m.id << "] Autor " << m.idAutor << ": " << m.contenido << "\n";
+                contador += 1 + imprimirRespuestasRec(msgsCanal, m.id, nivel + 1);
+            }
+        }
+        return contador;
+    }
+
     // Generador del dataset para las 150k datos
     string generarContenidoAleatorio(int idMensaje, int nUsuarios, string& tipoOut) {
         const char* verbos[] = {
@@ -626,6 +638,245 @@ public:
             }
         } while (op != 0);
     }
+
+    // ------------------------------------------------------------------------
+    // OPCIÓN 3: MENÚ MENSAJES E HILOS
+    // ------------------------------------------------------------------------
+    void menuMensajes() {
+        int op = 0;
+        do {
+            cout << "\n================ MENSAJES ================\n";
+            cout << "1. Listar mensajes\n";
+            cout << "2. Publicar mensaje (Texto, Archivo o Emoji)\n";
+            cout << "3. Editar mensaje existente (Guarda en Pila)\n";
+            cout << "4. Ver hilo (Recursivo)\n";
+            cout << "0. Volver\n";
+            cout << "Opcion: ";
+            op = leerEnteroSeguro();
+            if (op == -1) continue;
+            cin.ignore();
+
+            if (op == 1) {
+                auto ultimos = mensajes.filtrar([](const Mensaje&) { return true; }, -1, true);
+                for (int i = (int)ultimos.size() - 1; i >= 0; i--) {
+                    const auto& m = ultimos[i];
+                    cout << "Msg#" << m.id << " [Canal:" << m.idCanal << ", Autor:" << m.idAutor << "] "
+                        << m.fecha << ": " << m.contenido;
+                    if (m.idPadre > 0) cout << " (Resp a #" << m.idPadre << ")";
+                    cout << "\n";
+                }
+            }
+            else if (op == 2) {
+                int idCanal, idAutor, idPadre, tipoOp;
+                cout << "ID del canal: "; idCanal = leerEnteroSeguro();
+                cout << "ID del autor: "; idAutor = leerEnteroSeguro();
+                cin.ignore();
+
+                Canal** ptrC = indiceCanales.buscar(idCanal);
+                if (ptrC == nullptr) {
+                    cout << "Canal no encontrado.\n";
+                    continue;
+                }
+                if (indiceUsuarios.buscar(idAutor) == nullptr) {
+                    cout << "Usuario autor no encontrado.\n";
+                    continue;
+                }
+                if (!(*ptrC)->puedeEntrar(idAutor)) {
+                    cout << "ACCESO DENEGADO: No tienes permiso para publicar en este canal privado.\n";
+                    continue;
+                }
+
+                cout << "ID mensaje padre (0 si es mensaje nuevo, >0 si es respuesta en hilo): ";
+                idPadre = leerEnteroSeguro();
+                cout << "Tipo de contenido (1=Texto, 2=Archivo, 3=Emoji): ";
+                tipoOp = leerEnteroSeguro();
+                cin.ignore();
+
+                ContenidoMensaje* contObj = nullptr;
+                if (tipoOp == 2) {
+                    string nomArch;
+                    cout << "Nombre del archivo (ej. informe.pdf): ";
+                    getline(cin, nomArch);
+                    contObj = new MensajeArchivo(nomArch);
+                }
+                else if (tipoOp == 3) {
+                    string nomEmoji;
+                    cout << "Nombre del emoji (ej. rocket): ";
+                    getline(cin, nomEmoji);
+                    contObj = new Emoji(nomEmoji);
+                }
+                else {
+                    string txt;
+                    cout << "Texto del mensaje: ";
+                    getline(cin, txt);
+                    contObj = new MensajeTexto(txt);
+                }
+
+                int idNuevo = nextMensajeId++;
+                string contenidoFinal = contObj->generarContenido();
+                string tipoFinal = contObj->getTipo();
+                delete contObj;
+
+                Mensaje nuevo(idNuevo, idAutor, idCanal, idPadre, tipoFinal, contenidoFinal, obtenerTimestampActual());
+                mensajes.insertarFinal(nuevo);
+                (*ptrC)->incrementarMensajes();
+
+                if (idPadre > 0) {
+                    hilos.insertarFinal(Hilo(nextHiloId++, idPadre));
+                    Mensaje* msgPadre = mensajes.buscarPtr([idPadre](const Mensaje& m) { return m.id == idPadre; }, true);
+                    if (msgPadre != nullptr && msgPadre->idAutor != idAutor) {
+                        notificaciones.encolar(Notificacion(nextNotifId++, msgPadre->idAutor, idNuevo, "respuesta_hilo", false));
+                    }
+                }
+
+                // Detectar mencion @ID en el texto
+                int posArroba = -1;
+                for (int i = 0; i < (int)contenidoFinal.length(); i++) {
+                    if (contenidoFinal[i] == '@') {
+                        posArroba = i;
+                        break;
+                    }
+                }
+                if (posArroba != -1 && posArroba + 1 < (int)contenidoFinal.length() &&
+                    contenidoFinal[posArroba + 1] >= '0' && contenidoFinal[posArroba + 1] <= '9') {
+                    int idMencionado = 0;
+                    int k = posArroba + 1;
+                    while (k < (int)contenidoFinal.length() &&
+                        contenidoFinal[k] >= '0' && contenidoFinal[k] <= '9') {
+                        idMencionado = idMencionado * 10 + (contenidoFinal[k] - '0');
+                        k++;
+                    }
+                    notificaciones.encolar(Notificacion(nextNotifId++, idMencionado, idNuevo, "mencion", false));
+                }
+                else {
+                    notificaciones.encolar(Notificacion(nextNotifId++, idAutor, idNuevo, "mensaje_nuevo", false));
+                }
+
+                registrarLog(idAutor, "PUBLICAR_MENSAJE", "Publico Msg#" + to_string(idNuevo) + " en Canal#" + to_string(idCanal));
+                cout << "OK: Mensaje publicado con ID #" << idNuevo << " -> " << contenidoFinal << "\n";
+            }
+            else if (op == 3) {
+                int idM;
+                cout << "ID del mensaje a editar: ";
+                idM = leerEnteroSeguro();
+                cin.ignore();
+
+                Mensaje* m = mensajes.buscarPtr([idM](const Mensaje& x) { return x.id == idM; }, true);
+                if (m == nullptr) {
+                    cout << "Mensaje no encontrado.\n";
+                }
+                else {
+                    cout << "Contenido actual: " << m->contenido << "\n";
+                    cout << "Nuevo contenido: ";
+                    string nuevoTxt;
+                    getline(cin, nuevoTxt);
+
+                    ediciones.push(*m);
+                    m->contenido = nuevoTxt;
+                    m->fecha = obtenerTimestampActual();
+                    registrarLog(m->idAutor, "EDITAR_MENSAJE", "Edito Msg#" + to_string(idM));
+                    cout << "OK: Mensaje actualizado. Version anterior guardada en la pila de ediciones.\n";
+                }
+            }
+            else if (op == 4) {
+                int idRaiz;
+                cout << "ID del mensaje raiz: ";
+                idRaiz = leerEnteroSeguro();
+                cin.ignore();
+
+                Mensaje* raiz = mensajes.buscarPtr([idRaiz](const Mensaje& m) { return m.id == idRaiz; }, true);
+                if (raiz == nullptr) {
+                    cout << "Mensaje raiz no encontrado.\n";
+                }
+                else {
+                    cout << "\n=== HILO DE CONVERSACION RECURSIVO ===\n";
+                    cout << "[Raiz #" << raiz->id << "] " << raiz->contenido << "\n";
+                    auto msgsCanal = mensajes.filtrar([raiz](const Mensaje& m) {
+                        return m.idCanal == raiz->idCanal && m.idPadre > 0;
+                        }, -1, false);
+                    int totalResp = imprimirRespuestasRec(msgsCanal, idRaiz, 1);
+                    cout << "Total respuestas acumuladas: " << totalResp << "\n";
+                }
+            }
+        } while (op != 0);
+    }
+
+    // ------------------------------------------------------------------------
+    // OPCIÓN 4: HISTORIAL DE EDICIONES (PILA LIFO)
+    // ------------------------------------------------------------------------
+    void menuEdiciones() {
+        int op = 0;
+        do {
+            cout << "\n================ HISTORIAL DE EDICIONES (PILA) ================\n";
+            cout << "Ediciones respaldadas en pila: " << ediciones.getTamano() << "\n";
+            cout << "1. Ver pila de ediciones\n";
+            cout << "2. Deshacer ultima edicion (Pop y restaurar)\n";
+            cout << "3. Ver edicion mas antigua (verFondo)\n";
+            cout << "4. Deshacer varias ediciones en lote (deshacerLote)\n";
+            cout << "0. Volver\n";
+            cout << "Opcion: ";
+            op = leerEnteroSeguro();
+            if (op == -1) continue;
+            cin.ignore();
+
+            if (op == 1) {
+                if (ediciones.estaVacia()) {
+                    cout << "No hay ediciones en la pila.\n";
+                }
+                else {
+                    for (const auto& m : ediciones.listarTodos(-1)) {
+                        cout << "Msg#" << m.id << " [Autor:" << m.idAutor << "] (" << m.fecha << ") -> Version previa: " << m.contenido << "\n";
+                    }
+                }
+            }
+            else if (op == 2) {
+                if (ediciones.estaVacia()) {
+                    cout << "La pila esta vacia.\n";
+                }
+                else {
+                    Mensaje previa = ediciones.top();
+                    ediciones.pop();
+                    Mensaje* actual = mensajes.buscarPtr([&previa](const Mensaje& m) { return m.id == previa.id; }, true);
+                    if (actual != nullptr) {
+                        actual->contenido = previa.contenido;
+                        actual->fecha = previa.fecha;
+                    }
+                    registrarLog(previa.idAutor, "DESHACER_EDICION", "Restauro Msg#" + to_string(previa.id));
+                    cout << "OK: Msg#" << previa.id << " restaurado a: \"" << previa.contenido << "\"\n";
+                }
+            }
+            else if (op == 3) {
+                if (ediciones.estaVacia()) cout << "La pila esta vacia.\n";
+                else {
+                    Mensaje fondo = ediciones.verFondo();
+                    cout << "Edicion mas antigua en el fondo: Msg#" << fondo.id << " -> \"" << fondo.contenido << "\"\n";
+                }
+            }
+            else if (op == 4) {
+                if (ediciones.estaVacia()) {
+                    cout << "La pila esta vacia.\n";
+                }
+                else {
+                    int k;
+                    cout << "Cantidad de ediciones a deshacer en lote: ";
+                    k = leerEnteroSeguro();
+                    cin.ignore();
+                    auto lote = ediciones.deshacerLote(k);
+                    for (const auto& previa : lote) {
+                        Mensaje* actual = mensajes.buscarPtr([&previa](const Mensaje& m) { return m.id == previa.id; }, true);
+                        if (actual != nullptr) {
+                            actual->contenido = previa.contenido;
+                            actual->fecha = previa.fecha;
+                        }
+                    }
+                    registrarLog(1, "DESHACER_LOTE", "Restauro " + to_string(lote.size()) + " ediciones en lote");
+                    cout << "OK: Se restauraron " << lote.size() << " ediciones de la pila.\n";
+                }
+            }
+        } while (op != 0);
+    }
+
+
 
     // ------------------------------------------------------------------------
     // OPCIÓN 11: RESUMEN GENERAL
