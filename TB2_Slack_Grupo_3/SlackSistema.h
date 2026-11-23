@@ -876,7 +876,66 @@ public:
         } while (op != 0);
     }
 
+    // ------------------------------------------------------------------------
+    // OPCIÓN 5: NOTIFICACIONES
+    // ------------------------------------------------------------------------
+    void menuNotificaciones() {
+        int op = 0;
+        do {
+            cout << "\n================ NOTIFICACIONES ================\n";
+            cout << "1. Ver notificaciones\n";
+            cout << "2. Marcar como leida la siguiente\n";
+            cout << "3. Procesar varias\n";
+            cout << "4. Filtrar notificaciones por tipo (filtrarSi)\n";
+            cout << "0. Volver\n";
+            cout << "Opcion: ";
+            op = leerEnteroSeguro();
+            if (op == -1) continue;
+            cin.ignore();
 
+            if (op == 1) {
+                if (notificaciones.estaVacia()) {
+                    cout << "No hay notificaciones pendientes.\n";
+                }
+                else {
+                    for (const auto& n : notificaciones.listarTodos(-1)) {
+                        cout << "  Notificacion#" << n.id << " [Usuario:" << n.idUsuario << "] "
+                            << n.tipo << " [" << (n.leida ? "LEIDA" : "PENDIENTE") << "]\n";
+                    }
+                }
+            }
+            else if (op == 2) {
+                if (notificaciones.estaVacia()) {
+                    cout << "No hay notificaciones pendientes.\n";
+                }
+                else {
+                    Notificacion n = notificaciones.obtenerFrente();
+                    notificaciones.desencolar();
+                    cout << "OK: Notificacion#" << n.id << " [Usuario:" << n.idUsuario << "] (" << n.tipo << ") marcada como LEIDA.\n";
+                }
+            }
+            else if (op == 3) {
+                int k;
+                cout << "Cantidad de notificaciones a procesar en lote: ";
+                k = leerEnteroSeguro();
+                cin.ignore();
+                int proc = notificaciones.desencolarLote(k);
+                cout << "OK: Se procesaron " << proc << " notificaciones de la cola.\n";
+            }
+            else if (op == 4) {
+                string tipoBuscado;
+                cout << "Tipo a filtrar (mencion / mensaje_nuevo / respuesta_hilo / cambio_estado): ";
+                getline(cin, tipoBuscado);
+                auto filtradas = notificaciones.filtrarSi([&tipoBuscado](const Notificacion& n) {
+                    return n.tipo == tipoBuscado;
+                    });
+                cout << "Encontradas " << filtradas.size() << " notificaciones de tipo '" << tipoBuscado << "':\n";
+                for (const auto& n : filtradas) {
+                    cout << "  Notificacion#" << n.id << " [Usuario:" << n.idUsuario << "] Msg#" << n.idMensaje << "\n";
+                }
+            }
+        } while (op != 0);
+    }
 
     // ------------------------------------------------------------------------
     // OPCIÓN 11: RESUMEN GENERAL
